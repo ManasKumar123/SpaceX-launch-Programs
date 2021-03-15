@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="style.css">
+	<style>
+		*{padding: 0; margin: 0; box-sizing: border-box;}
+.main {width: 100%; height: auto; max-width: 1440px; margin: 0 auto;}
+.mainInn {width: 100%;float: left;  background: #f2f2f2; padding-bottom: 25px}
+.topHead {padding: 10px}
+ul.yearList {display: flex; flex-wrap: wrap; justify-content: space-between;}
+ul.yearList li{list-style: none; cursor: pointer; width: 40%; background: #c5e09b; padding: 6px; text-align: center; border-radius: 5px; margin-bottom: 10px}
+
+ul.missList li{cursor: pointer; margin-left: 28px; cursor: none; list-style-type: disc; color: #6468a0}
+ul li.active{background: #7cba01;}
+.leftSec{float: left; width: 20%; padding: 10px;}
+.rgtSec{float: right; width: 80%; position: relative;}
+.DataHolder {display: flex; flex-wrap: wrap;}
+.topSec{float: left; width: 100%; padding: 10px}
+.footerSec{float: left; width: 100%; text-align: center; margin-top: 10px}
+.missionBox{float: left; width: 25%; padding: 0 10px; display: flex; margin-bottom: 16px}
+.missionBox img{max-width: 70%;}
+.clearFilter{cursor: pointer;}
+.dataLoader{position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 2; background: #fff; display: none;}
+.dataLoader img{display: block; margin: 0 0 10px 50px;}
+.loaderCont{padding:100px 0 0 30%;}
+.innerBox {background: #fff; padding: 20px; width: 100%}
+.leftInner {padding: 10px 20px; background: #fff}
+.imgBox {width: 100%; background: #f2f2f2; text-align: center; margin-bottom: 10px }
+.yearHolder {margin-top: 10px}
+.yearHolder,
+.succLaunch,
+.succLanding {margin-bottom: 10px}
+.blueCol {color: #6468a0}
+.leftSec h4 {text-align: center; position: relative; padding-bottom: 2px; margin-bottom: 8px;}
+.leftSec h4:after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	width: 80%;
+	height: 1px;
+	background: #dddad9;
+	left: 0;
+	right: 0;
+	margin: 0 auto
+}
+
+@media screen and (max-width: 1200px) {
+	.leftSec{width: 25%;}
+	.rgtSec{width: 75%;}
+	.missionBox{width: 33.33%;}
+}
+
+@media screen and (max-width: 1023px) {
+	.leftSec{width: 33.33%;}
+	.rgtSec{width: 66.67%;}
+	.missionBox{width: 50%;}
+}
+
+@media screen and (max-device-width: 700px) {
+	.leftSec{width: 50%;}
+	.rgtSec{width: 50%;}
+	.missionBox{width: 100%;}
+}
+@media screen and (max-device-width: 480px) {
+	.mainInn {display: flex; justify-content: center; flex-direction: column; align-items: center;}
+	.topSec {width: 50%;} 
+	.leftSec{width: 100%;}
+	.rgtSec{width: 100%; float: left;}
+	.missionBox{width: 100%;}
+	.footerSec {width: 50%}
+}
+	</style>
+
+</head>
+<body>
+	<div class="main">
+		<div class="mainInn">
+			<div class="topSec">
+				<h1 class="topHead">SpaceX launch Programs</h1>
+				<div class="leftSec">
+					<div class="leftInner">
+						<h2>Filters</h2>
+						<div class="yearHolder">
+							<h4>Launch Year</h4>
+							<ul class="yearList"></ul>
+						</div>
+
+						<div class="succLaunch">
+							<h4>Successful Launch</h4>
+							<ul class="yearList">
+								<li>True</li>
+								<li>False</li>
+							</ul>
+						</div>
+
+						<div class="succLanding">
+							<h4>Successful Landing</h4>
+							<ul class="yearList">
+								<li>True</li>
+								<li>False</li>
+							</ul>
+						</div>
+
+						<div class="clearFilter">Clear Filter</div>
+					</div>
+				</div>
+				<div class="rgtSec">
+					<div class="DataHolder"></div>
+					<div class="dataLoader">
+						<div class="loaderCont">
+							<img src="preLoader.gif" alt="">
+							<span>Data Loading please wait..!!</span>
+						</div>					
+					</div>
+				</div>
+			</div>
+			<div class="footerSec">
+				<strong>Developed by:</strong> <label class="developerName"></label>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var developerName = "Manas Kumar Barik";
+			var yearStart = 2006;
+			var yearEnd = 2020;
+			var filterData = [null, null, null];
+
+			var yearList = '';
+			for(var i= 0; i<= yearEnd-yearStart; i++){
+				yearList += "<li>"+ parseInt(yearStart+i) +"</li>";
+			}
+			$(".yearHolder ul").html(yearList);
+			$(".developerName").html(developerName);			
+
+			function getDataFromAPI(){
+				$(".dataLoader").show();
+				var isComingfromFilter = false;
+				var APIPath = 'https://api.spaceXdata.com/v3/launches?limit=100';
+				$.each(filterData, function(x, y){
+					if(y != null){
+						isComingfromFilter = true;
+						return false;
+					}
+				})
+
+				if(isComingfromFilter){	
+					var createPath = '';				
+					$.each(filterData, function(a,b){
+						if(a == 0 && b != null){
+							createPath += '&launch_year='+b;
+						}
+						if(a == 1 && b != null){
+							createPath += '&launch_success='+b;
+						}
+						if(a == 2 && b != null){
+							createPath += '&land_success='+b;
+						}											
+					});
+					APIPath = 'https://api.spaceXdata.com/v3/launches?limit=100'+createPath;
+				}				
+
+				$.get(APIPath, function(data){
+					if(data.length == 0){
+						$(".DataHolder").html("No Data fund");
+						$(".dataLoader").hide();
+					}
+					else{
+						var missionDataDiv = '';
+						$.each(data, function(k, v){						
+							var missionBox = '<div class="missionBox"><div class="innerBox">';
+							missionBox += '<div class="imgBox"><img alt="" src="'+v.links.mission_patch_small+'" /></div>';
+							missionBox += '<h4 class="blueCol">'+v.mission_name+' #'+v.flight_number+'</h4><br>';	
+							missionBox += '<h4>Mission Ids:</h4>';
+							if(v.mission_id.length > 0){
+								missionBox += '<ul class="missList">';
+								$.each(v.mission_id, function(a, b){
+									missionBox += '<li>'+b+'</li>'
+								})
+								missionBox += '</ul>';
+							}
+							else{
+								missionBox += '<p class="blueCol">No mission ids found in record</p>';
+							}
+							missionBox += '<br><p><b>Launch Year:</b> <span class="blueCol">'+v.launch_year+'</span></p><br>';
+							missionBox += '<p><b>Successful Launch:</b> <span class="blueCol">'+v.launch_success+'</span></p><br>';
+							missionBox += '<p><b>Successful Landing:</b> <span class="blueCol">'+v.land_success+'</span></p>';
+							missionBox += "</div></div>"
+							missionDataDiv += missionBox;
+						})
+						$(".DataHolder").html(missionDataDiv);
+						$(".dataLoader").hide();
+					}
+								
+				})
+			}
+			
+			getDataFromAPI();
+
+			$(".yearHolder ul li").off("click").on("click", function(){
+				$(".yearHolder ul li").removeClass("active");
+				$(this).addClass("active");
+				filterData[0] = $(this).html();
+				getDataFromAPI();
+			});
+
+			$(".succLaunch ul li").off("click").on("click", function(){
+				$(".succLaunch ul li").removeClass("active");
+				$(this).addClass("active");
+				filterData[1] = $(this).html().toLowerCase();
+				getDataFromAPI();
+			});
+
+			$(".succLanding ul li").off("click").on("click", function(){
+				$(".succLanding ul li").removeClass("active");
+				$(this).addClass("active");
+				filterData[2] = $(this).html().toLowerCase();
+				getDataFromAPI();
+			});	
+
+			$(".clearFilter").off("click").on("click", function(){
+				$(".yearHolder ul li").removeClass("active");
+				$(".succLaunch ul li").removeClass("active");
+				$(".succLanding ul li").removeClass("active");
+				filterData = [null, null, null];
+				getDataFromAPI();
+			})				
+			
+		})
+	</script>
+</body>
+</html>
